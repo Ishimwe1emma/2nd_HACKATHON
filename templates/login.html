@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | Imena Health</title>
+    <style>
+        /* Background image and blur effect */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('https://images.pexels.com/photos/5207029/pexels-photo-5207029.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            position: relative;
+        }
+
+        /* Overlay to blur background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            backdrop-filter: blur(5px);
+            z-index: 1;
+        }
+
+        /* Login container - transparent */
+        .login-container {
+            position: relative;
+            z-index: 2;
+            background-color: rgba(255, 255, 255, 0.15); /* low opacity */
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            width: 350px;
+            text-align: center;
+            color: #035e2c;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
+
+        /* Input styling */
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            border-color: #ffffff;
+            box-shadow: 0 0 8px rgba(255,255,255,0.5);
+            outline: none;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Button styling */
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background-color: rgba(69, 123, 157, 0.8);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: rgba(29, 53, 87, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Link styling */
+        p {
+            margin-top: 20px;
+            color: #ffffff;
+        }
+
+        a {
+            color: #e63946;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login to Imena Health</h2>
+        <form method="POST" action="/login">
+            <input type="email" name="email" placeholder="Email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p>Don't have an account? <a href="/register">Register here</a></p>
+    </div>
+</body>
+</html>

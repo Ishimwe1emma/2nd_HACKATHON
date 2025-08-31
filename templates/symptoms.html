@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Report Symptoms | Imena Health</title>
+    <style>
+        /* Body & background image */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: url('https://images.pexels.com/photos/7722918/pexels-photo-7722918.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: #1d3557;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 5px rgba(0,0,0,0.5);
+        }
+
+        form {
+            width: 90%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Glassy textarea */
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.6);
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(6px);
+            color: #000;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #457b9d;
+            box-shadow: 0 0 10px rgba(69,123,157,0.6);
+        }
+
+        button {
+            background-color: #457b9d;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #1d3557;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .result-section {
+            width: 90%;
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(8px);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0px 0px 20px rgba(0,0,0,0.2);
+            margin-top: 25px;
+            color: #1d3557;
+        }
+
+        .condition {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background-color: rgba(168, 218, 220, 0.8);
+            font-weight: bold;
+        }
+
+        .first-aid {
+            background-color: rgba(255, 224, 102, 0.8);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Hi {{ current_user.name }}, enter your symptoms:</h2>
+
+    <form method="POST" action="/symptoms">
+        <textarea name="symptoms" rows="5" placeholder="Describe your symptoms here..." required>{{ request.form.symptoms }}</textarea>
+        <button type="submit">Analyze Symptoms</button>
+    </form>
+
+    {% if result %}
+        <div class="result-section">
+            <h3>🩺 Possible Conditions:</h3>
+            {% if result.label %}
+                <div class="condition">
+                    <span>{{ result.label }}</span>
+                    <span>Confidence: {{ result.score }}</span>
+                </div>
+            {% else %}
+                <p>{{ result }}</p>
+            {% endif %}
+
+            <h3>🧴 First Aid Advice:</h3>
+            {% if result.first_aid %}
+                <div class="first-aid">
+                    <p>{{ result.first_aid }}</p>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+</body>
+</html>
