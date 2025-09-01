@@ -5,6 +5,7 @@ from flask_login import LoginManager, login_user, logout_user, login_required, U
 import os
 from dotenv import load_dotenv
 from huggingface_hub import InferenceClient
+import re
 
 # ----------------------------
 # Load environment variables
@@ -17,10 +18,22 @@ HF_TOKEN = os.getenv("HF_TOKEN")
 # ----------------------------
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv("SECRET_KEY")
-app.config['SQLALCHEMY_DATABASE_URI'] = (
-    f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
-    f"@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
-)
+
+# ----------------------------
+# Database config (Postgres for deploy, MySQL for local)
+# ----------------------------
+database_url = os.getenv("DATABASE_URL")
+
+if database_url:
+    # Fix Heroku-style postgres:// to postgresql://
+    database_url = re.sub(r'^postgres://', 'postgresql://', database_url)
+    app.config["SQLALCHEMY_DATABASE_URI"] = database_url
+else:
+    # Local MySQL fallback
+    app.config['SQLALCHEMY_DATABASE_URI'] = (
+        f"mysql+pymysql://{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}"
+        f"@{os.getenv('DB_HOST')}/{os.getenv('DB_NAME')}"
+    )
 
 # ----------------------------
 # Extensions
@@ -63,7 +76,6 @@ def index():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        # Check if email or phone already exists
         existing_email = User.query.filter_by(email=request.form['email']).first()
         existing_phone = User.query.filter_by(phone=request.form['phone']).first()
 
@@ -74,10 +86,8 @@ def register():
             flash("Phone number already registered. Please use a different phone.", "danger")
             return redirect(url_for("register"))
 
-        # Hash the password
         hashed_pw = bcrypt.generate_password_hash(request.form['password']).decode('utf-8')
 
-        # Create new user
         user = User(
             name=request.form['name'],
             gender=request.form['gender'],
@@ -102,12 +112,11 @@ def login():
         if user and bcrypt.check_password_hash(user.password, request.form['password']):
             login_user(user)
             flash("✅ Login successful!", "success")
-            return redirect(url_for("symptoms"))  # Redirect to symptoms page
+            return redirect(url_for("symptoms"))
         else:
             flash("❌ Login failed. Check your email/password.", "danger")
             return redirect(url_for("login"))
 
-    # If user already logged in, redirect to symptoms
     if current_user.is_authenticated:
         return redirect(url_for("symptoms"))
 
@@ -125,10 +134,10 @@ def symptoms():
         score = round(api_result[0]["score"], 2)
 
         advice_mapping = {
-            "POSITIVE": "Seek medical attention and stay hydrated.",
-            "NEGATIVE": "Monitor your symptoms, usually mild."
+            "POSITIVE": "🚨 Seek medical attention and stay hydrated.",
+            "NEGATIVE": "✅ Monitor your symptoms, usually mild."
         }
-        first_aid = advice_mapping.get(label, "Follow general health precautions.")
+        first_aid = advice_mapping.get(label, "⚠️ Follow general health precautions.")
         result = {"label": label, "score": score, "first_aid": first_aid}
 
     return render_template("symptoms.html", result=result)
